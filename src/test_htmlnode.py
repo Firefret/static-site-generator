@@ -23,4 +23,4 @@ class TestHtmlNode(unittest.TestCase):
 
         html_node.props = {"disabled":None}
         with self.subTest("boolean prop with None value"):
-            self.assertEqual(html_node.props_to_html(), "")
+            self.assertEqual(html_node.props_to_html(), " disabled")
