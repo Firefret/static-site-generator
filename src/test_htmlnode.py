@@ -52,3 +52,28 @@ class TestLeafNode(unittest.TestCase):
         node = LeafNode("p", "Hello, world!", {"disabled": None})
         with self.subTest("props with None value"):
             self.assertEqual(node.to_html(), "<p disabled>Hello, world!</p>")
+
+
+class TestParentNode(unittest.TestCase):
+    def test_to_html(self):
+        with self.subTest("empty children"):
+            self.assertRaises(ValueError, ParentNode("div", []).to_html)
+
+        with self.subTest("one child"):
+            child = LeafNode("p", "Hello, world!")
+            parent = ParentNode("div", [child])
+            self.assertEqual(parent.to_html(), "<div><p>Hello, world!</p></div>")
+
+        with self.subTest("multiple children"):
+            child1 = LeafNode("p", "Hello, world!")
+            child2 = LeafNode("span", "Balls", )
+            parent = ParentNode("div", [child1, child2])
+            self.assertEqual(parent.to_html(), "<div><p>Hello, world!</p><span>Balls</span></div>")
+
+        with self.subTest("nested children"):
+            child1 = LeafNode("p", "Hello, world!")
+            child2 = LeafNode("span", "Balls", {"class": "test"})
+            child3 = LeafNode("img", "Image", {"src":"https://firefret.xyz/cocks.jpg"})
+            parent = ParentNode("div", [child1, child2], {"disabled": None})
+            grandparent = ParentNode("section", [parent, child3])
+            self.assertEqual(grandparent.to_html(), "<section><div disabled><p>Hello, world!</p><span class=\"test\">Balls</span></div><img src=\"https://firefret.xyz/cocks.jpg\">Image</img></section>")

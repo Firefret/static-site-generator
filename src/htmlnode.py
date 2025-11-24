@@ -1,5 +1,7 @@
+from typing import List, Dict
+
 class HTMLNode:
-    def __init__(self, tag=None, value=None, children=None, props=None):
+    def __init__(self, tag=None, value=None, children=None|dict[str, str], props=None):
         self.tag = tag
         self.value = value
         self.children = children or []
@@ -34,3 +36,17 @@ class LeafNode(HTMLNode):
             return self.value
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children:list[HTMLNode], props = None):
+        super().__init__(tag, None, children, props)
+
+    def to_html(self):
+        if not self.tag:
+            raise ValueError("Tag cannot be empty")
+        if not self.children:
+            raise ValueError("This is a parent node, has to have children")
+        node_string = f"<{self.tag}{self.props_to_html()}>"
+        for child in self.children:
+            node_string += child.to_html()
+        node_string += f"</{self.tag}>"
+        return node_string
