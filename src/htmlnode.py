@@ -1,4 +1,22 @@
-from typing import List, Dict
+from textnode import *
+
+
+def text_node_to_html_node(text_node:TextNode):
+    if text_node.text_type not in TextType:
+        raise TypeError("Invalid text type")
+    if text_node.text_type == TextType.PLAIN or text_node.text_type == TextType.TEXT:
+        return LeafNode(None, text_node.text)
+    if text_node.text_type == TextType.BOLD:
+        return LeafNode("b", text_node.text)
+    if text_node.text_type == TextType.ITALIC:
+        return LeafNode("i", text_node.text)
+    if text_node.text_type == TextType.CODE:
+        return LeafNode("code", text_node.text)
+    if text_node.text_type == TextType.LINK:
+        return LeafNode("a", text_node.text, {"href": text_node.url})
+    if text_node.text_type == TextType.IMAGE:
+        return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
+
 
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None|dict[str, str], props=None):
@@ -23,6 +41,12 @@ class HTMLNode:
 
     def __repr__(self):
         return f"Tag: {self.tag}, Value: {self.value}, Children: {self.children}, Props: {self.props}"
+
+    def __eq__(self, other):
+        return (self.tag == other.tag and
+                self.value == other.value and
+                self.children == other.children and
+                self.props == other.props)
 
 
 class LeafNode(HTMLNode):

@@ -1,4 +1,5 @@
 from htmlnode import *
+from textnode import *
 import unittest
 
 class TestHtmlNode(unittest.TestCase):
@@ -77,3 +78,41 @@ class TestParentNode(unittest.TestCase):
             parent = ParentNode("div", [child1, child2], {"disabled": None})
             grandparent = ParentNode("section", [parent, child3])
             self.assertEqual(grandparent.to_html(), "<section><div disabled><p>Hello, world!</p><span class=\"test\">Balls</span></div><img src=\"https://firefret.xyz/cocks.jpg\">Image</img></section>")
+
+class TestTextNodeToHTMLNode(unittest.TestCase):
+    def test_text_node_to_html_node(self):
+        with self.subTest("invalid text type"):
+            self.assertRaises(TypeError, text_node_to_html_node(TextNode("Hello, world!", "italic")))
+
+        with self.subTest("plain text"):
+            node = TextNode("Hello, world!", TextType.PLAIN)
+            node2 = TextNode("Hello, world2!", TextType.TEXT)
+            html_node = LeafNode(None, "Hello, world!")
+            html_node2 = LeafNode(None, "Hello, world2!")
+            self.assertEqual(text_node_to_html_node(node), html_node)
+            self.assertEqual(text_node_to_html_node(node2), html_node2)
+
+        with self.subTest("bold text"):
+            node = TextNode("Hello, world!", TextType.BOLD)
+            html_node = LeafNode("b", "Hello, world!")
+            self.assertEqual(text_node_to_html_node(node), html_node)
+
+        with self.subTest("italic text"):
+            node = TextNode("Hello, world!", TextType.ITALIC)
+            html_node = LeafNode("i", "Hello, world!")
+            self.assertEqual(text_node_to_html_node(node), html_node)
+
+        with self.subTest("code text"):
+            node = TextNode("Hello, world!", TextType.CODE)
+            html_node = LeafNode("code", "Hello, world!")
+            self.assertEqual(text_node_to_html_node(node), html_node)
+
+        with self.subTest("link text"):
+            node = TextNode("Hello, world!", TextType.LINK, "https://google.com")
+            html_node = LeafNode("a", "Hello, world!", {"href": "https://google.com"})
+            self.assertEqual(text_node_to_html_node(node), html_node)
+
+        with self.subTest("image text"):
+            node = TextNode("Hello, world!", TextType.IMAGE, "https://google.com/image.png")
+            html_node = LeafNode("img", "", {"src": "https://google.com/image.png", "alt": "Hello, world!"})
+            self.assertEqual(text_node_to_html_node(node), html_node)
