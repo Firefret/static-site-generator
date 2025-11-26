@@ -9,6 +9,12 @@ class TextType(Enum):
     LINK = "link"
     IMAGE = "image"
 
+text_type_delimiters = {
+    TextType.BOLD: "**",
+    TextType.ITALIC: "_",
+    TextType.CODE: "`"
+}
+
 class TextNode:
     def __init__(self, text, text_type:TextType, url=None):
         self.text = text
