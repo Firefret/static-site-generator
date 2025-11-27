@@ -1,4 +1,5 @@
 from textnode import *
+import re
 
 def split_nodes_delimiter(old_nodes:list[TextNode], delimiter:str, text_type:TextType):
     new_nodes = []
@@ -18,8 +19,16 @@ def split_nodes_delimiter(old_nodes:list[TextNode], delimiter:str, text_type:Tex
         for i in range(0, len(to_be_nodes)):
             if len(to_be_nodes[i])<1:
                 continue
-            if i%2 != 0: ## because of this the cycle has to be indented, otherwise this , I can't think of a more concise way
+            if i%2 != 0: # because of this the cycle has to be indented, otherwise this messes up the count, I can't think of a more concise way
                 new_nodes.append(TextNode(to_be_nodes[i], text_type))
             else:
                 new_nodes.append(TextNode(to_be_nodes[i], TextType.TEXT))
     return new_nodes
+
+def extract_markdown_images(text:str):
+    matches = re.findall(r"!\[(.+?)\]\((.+?)\)", text)
+    return matches
+
+def extract_markdown_links(text:str):
+    matches = re.findall(r"(?<!\!)\[(.+?)\]\((.+?)\)", text)
+    return matches

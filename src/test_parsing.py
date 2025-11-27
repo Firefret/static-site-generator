@@ -153,6 +153,72 @@ class TestSplitNodesDelimiter(unittest.TestCase):
                 ]
             )
 
+class TestMarkdownExtraction(unittest.TestCase):
 
+    def test_extract_markdown_images(self):
+        cases = [
+            (
+                "single image",
+                "![rick roll](https://i.imgur.com/aKaOqIh.gif)",
+                [("rick roll", "https://i.imgur.com/aKaOqIh.gif")],
+            ),
+            (
+                "multiple images",
+                "![one](a.png) text ![two](b.jpg)",
+                [("one", "a.png"), ("two", "b.jpg")],
+            ),
+            (
+                "no images",
+                "this text has no image syntax",
+                [],
+            ),
+            (
+                "mixed content with links",
+                "![img](x) [link](y) ![pic](z)",
+                [("img", "x"), ("pic", "z")],
+            ),
+            (
+                "malformed url allowed",
+                "![alt](not a real url)",
+                [("alt", "not a real url")],
+            ),
+        ]
+
+        for label, input_text, expected in cases:
+            with self.subTest(label=label):
+                self.assertEqual(extract_markdown_images(input_text), expected)
+
+    def test_extract_markdown_links(self):
+        cases = [
+            (
+                "single link",
+                "[to youtube](https://www.youtube.com/@bootdotdev)",
+                [("to youtube", "https://www.youtube.com/@bootdotdev")],
+            ),
+            (
+                "multiple links",
+                "[one](balls.com) text [two](cock.ua)",
+                [("one", "balls.com"), ("two", "cock.ua")],
+            ),
+            (
+                "no links",
+                "text without markdown links",
+                [],
+            ),
+            (
+                "images ignored",
+                "![img](x) [link](y) ![pic](z)",
+                [("link", "y")],
+            ),
+            (
+                "malformed url allowed",
+                "[text](not a real url)",
+                [("text", "not a real url")],
+            ),
+        ]
+
+        for label, input_text, expected in cases:
+            with self.subTest(label=label):
+                self.assertEqual(extract_markdown_links(input_text), expected)
 if __name__ == '__main__':
     unittest.main()
