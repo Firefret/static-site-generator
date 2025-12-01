@@ -1,5 +1,5 @@
 import unittest
-from parsing import *
+from parsing_inline import *
 from textnode import TextNode, TextType
 
 
