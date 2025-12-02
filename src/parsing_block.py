@@ -89,5 +89,18 @@ def markdown_to_html_node(markdown:str):
     block_nodes = []
     for block in blocks:
         block_type = block_to_block_type(block)
-        children = markdown_to_leaves(block)
-        block_node = ParentNode
+        if block_type == BlockType.HEADING:
+            block_nodes.append(heading_block_to_html_node(block))
+        if block_type == BlockType.QUOTE:
+            block_nodes.append(quote_block_to_html_node(block))
+        if block_type == BlockType.UNORDERED_LIST:
+            block_nodes.append(unordered_list_block_to_html_node(block))
+        if block_type == BlockType.ORDERED_LIST:
+            block_nodes.append(ordered_list_block_to_html_node(block))
+        if block_type == BlockType.CODE:
+            block_nodes.append(code_block_to_html_node(block))
+        if block_type == BlockType.PARAGRAPH:
+            block_nodes.append(paragraph_block_to_html_node(block))
+        else:
+            raise TypeError("Invalid block type")
+    return ParentNode("div", block_nodes)
