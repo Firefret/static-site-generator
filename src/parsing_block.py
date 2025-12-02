@@ -1,8 +1,6 @@
-from quopri import quote
-
-from idna import ulabel
-
 from block import *
+from parsing_inline import *
+from htmlnode import *
 
 def markdown_to_blocks(markdown:str):
     blocks = markdown.split("\n\n")
@@ -33,11 +31,63 @@ def block_to_block_type(block:str):
         return BlockType.ORDERED_LIST
     return BlockType.PARAGRAPH
 
+def markdown_to_leaves(markdown:str):
+    text_nodes = text_to_textnodes(markdown)
+    leaves = []
+    for text_node in text_nodes:
+        leaves.append(text_node_to_html_node(text_node))
+    return leaves
 
-"""
-    ###### space heading
-``` ``` code
-> (every line) quote
-- space(every line) ul
-Number dot whitespace, start at 1, increment
-"""
+def quote_block_to_html_node(block:str):
+    lines = block.split("\n")
+    for line in lines:
+        line = line.lstrip(">")
+    block = "\n".join(lines)
+    leaves = markdown_to_leaves(block)
+    quote_node = ParentNode("blockquote", leaves)
+    return quote_node
+
+def unordered_list_block_to_html_node(block:str):
+    lines = block.split("\n")
+    list_items = []
+    for line in lines:
+        list_item = line.lstrip("- ")
+        item_node = ParentNode("li", markdown_to_leaves(list_item))
+        list_items.append(item_node)
+    list_node = ParentNode("ul", list_items)
+    return list_node
+
+def ordered_list_block_to_html_node(block:str):
+    lines = block.split("\n")
+    list_items = []
+    for index, line in enumerate(lines, start=1):
+        list_item = line.lstrip(f"{index}. ")
+        item_node = ParentNode("li", markdown_to_leaves(list_item))
+        list_items.append(item_node)
+    list_node = ParentNode("ol", list_items)
+    return list_node
+
+def code_block_to_html_node(block:str):
+    code_node = LeafNode("code", block)
+    return ParentNode("pre", [code_node])
+
+def heading_block_to_html_node(block:str):
+    heading_level = len(block) - len(block.lstrip("#"))
+    text = block[1:]
+    leaves = markdown_to_leaves(text)
+    heading_node = ParentNode(f"h{heading_level}", leaves)
+    return heading_node
+
+def paragraph_block_to_html_node(block:str):
+    leaves = markdown_to_leaves(block)
+    paragraph_node = ParentNode("p", leaves)
+    return paragraph_node
+
+
+def markdown_to_html_node(markdown:str):
+    blocks = markdown_to_blocks(markdown)
+    block_nodes = []
+    for block in blocks:
+        block_type = block_to_block_type(block)
+        children = markdown_to_leaves(block)
+        block_node = ParentNode
