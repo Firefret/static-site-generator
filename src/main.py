@@ -2,8 +2,9 @@ from textnode import *
 import os
 import shutil
 
-SOURCE_DIR = "../static"
-DESTINATION_DIR = "../public"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SOURCE_DIR = os.path.join(BASE_DIR, "../static")
+DESTINATION_DIR = os.path.join(BASE_DIR, "../public")
 
 def source_to_destination_copy(source = SOURCE_DIR, destination = DESTINATION_DIR):
     source = os.path.realpath(source)
