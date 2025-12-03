@@ -41,7 +41,7 @@ def markdown_to_leaves(markdown:str):
 def quote_block_to_html_node(block:str):
     lines = block.split("\n")
     lines = [line.lstrip(">") for line in lines]
-    block = "\n".join(lines).strip()
+    block = "<br>".join(lines).strip()
     leaves = markdown_to_leaves(block)
     quote_node = ParentNode("blockquote", leaves)
     return quote_node
@@ -74,11 +74,15 @@ def code_block_to_html_node(block:str):
 def heading_block_to_html_node(block:str):
     heading_level = len(block) - len(block.lstrip("#"))
     text = block.lstrip("# ")
+    lines = text.split("\n")
+    text = "<br>".join(lines).strip()
     leaves = markdown_to_leaves(text)
     heading_node = ParentNode(f"h{heading_level}", leaves)
     return heading_node
 
 def paragraph_block_to_html_node(block:str):
+    lines = block.split("\n")
+    block = "<br>".join(lines).strip()
     leaves = markdown_to_leaves(block)
     paragraph_node = ParentNode("p", leaves)
     return paragraph_node
