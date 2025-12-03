@@ -40,9 +40,8 @@ def markdown_to_leaves(markdown:str):
 
 def quote_block_to_html_node(block:str):
     lines = block.split("\n")
-    for line in lines:
-        line = line.lstrip(">")
-    block = "\n".join(lines)
+    lines = [line.lstrip(">") for line in lines]
+    block = "\n".join(lines).strip()
     leaves = markdown_to_leaves(block)
     quote_node = ParentNode("blockquote", leaves)
     return quote_node
@@ -68,12 +67,13 @@ def ordered_list_block_to_html_node(block:str):
     return list_node
 
 def code_block_to_html_node(block:str):
+    block = block.strip("```")
     code_node = LeafNode("code", block)
     return ParentNode("pre", [code_node])
 
 def heading_block_to_html_node(block:str):
     heading_level = len(block) - len(block.lstrip("#"))
-    text = block[1:]
+    text = block.lstrip("# ")
     leaves = markdown_to_leaves(text)
     heading_node = ParentNode(f"h{heading_level}", leaves)
     return heading_node
@@ -91,15 +91,15 @@ def markdown_to_html_node(markdown:str):
         block_type = block_to_block_type(block)
         if block_type == BlockType.HEADING:
             block_nodes.append(heading_block_to_html_node(block))
-        if block_type == BlockType.QUOTE:
+        elif block_type == BlockType.QUOTE:
             block_nodes.append(quote_block_to_html_node(block))
-        if block_type == BlockType.UNORDERED_LIST:
+        elif block_type == BlockType.UNORDERED_LIST:
             block_nodes.append(unordered_list_block_to_html_node(block))
-        if block_type == BlockType.ORDERED_LIST:
+        elif block_type == BlockType.ORDERED_LIST:
             block_nodes.append(ordered_list_block_to_html_node(block))
-        if block_type == BlockType.CODE:
+        elif block_type == BlockType.CODE:
             block_nodes.append(code_block_to_html_node(block))
-        if block_type == BlockType.PARAGRAPH:
+        elif block_type == BlockType.PARAGRAPH:
             block_nodes.append(paragraph_block_to_html_node(block))
         else:
             raise TypeError("Invalid block type")
