@@ -6,7 +6,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "../static")
 PUBLIC_DIR = os.path.join(BASE_DIR, "../public")
 TEMPLATE_PATH = os.path.join(BASE_DIR, "../template.html")
-MARKDOWN_PATH = os.path.join(BASE_DIR, "../content/index.md")
+MARKDOWN_PATH = os.path.join(BASE_DIR, "../content")
 
 def source_to_destination_copy(source = STATIC_DIR, destination = PUBLIC_DIR):
     source = os.path.realpath(source)
@@ -49,7 +49,7 @@ def generate_page(from_path: os.PathLike = MARKDOWN_PATH, template_path: os.Path
     if file_name[-1] != "md":
         raise ValueError("Provided file is not a markdown file (.md extension expected)")
     file_name = "".join(file_name[:-1])
-    print(f"File name: {file_name}")
+    print(f"File name: {file_name}.md")
     template = open(template_path, "r").read()
     html_string = markdown_to_html_node(markdown).to_html()
     title = extract_title(markdown)
@@ -68,11 +68,24 @@ def generate_page(from_path: os.PathLike = MARKDOWN_PATH, template_path: os.Path
     markdown_object.close()
     html_file.close()
 
+def generate_page_recursive(dir_path_content: os.PathLike, template_dir_path: os.PathLike, dest_dir_path: os.PathLike):
+    current_folder = os.path.abspath(dir_path_content)
+    template_folder = os.path.abspath(template_dir_path)
+    dest_folder = os.path.abspath(dest_dir_path)
+    for file in os.listdir(current_folder):
+        print(f"Processing {file}...")
+        file_path = os.path.abspath(os.path.join(current_folder, file))
+        dest_file_path = os.path.abspath(os.path.join(dest_folder, file))
+        if os.path.isdir(file_path):
+            generate_page_recursive(file_path, template_folder, dest_file_path)
+        elif file_path.endswith(".md"):
+            generate_page(file_path, template_folder, dest_folder)
+
 
 
 def main():
     source_to_destination_copy()
-    generate_page()
+    generate_page_recursive(MARKDOWN_PATH, TEMPLATE_PATH, PUBLIC_DIR)
 
 
 if __name__ == "__main__":
